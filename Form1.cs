@@ -1,6 +1,7 @@
-﻿using Columns.ExcerciseView;
+﻿using Columns.ExcerciseGrid;
 using Columns.Exercises;
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -9,43 +10,79 @@ namespace Columns
     public partial class Form1 : Form
     {
         private Exercise CurrentExercise;
-        private PrinterInterface ExerciseDrawer;
+        private GridderInterface ExerciseGridder;
         private ExerciseManager EManager;
+        private int StopAfterCountExercises = 0;
+        private string RunProcessAfterSuccessFinish = "";
 
         public Form1()
         {
             InitializeComponent();
+            EManager = new ExerciseManager();
+            var args = Environment.GetCommandLineArgs();
+            for (int i = 0; i < args.Length; i++)
+            {
+                var argParts = args[i].Split('=');
+                if (argParts.Length < 2)
+                {
+                    continue;
+                }
+                var cmd = argParts[0].Trim().TrimStart(new [] {'-'});
+                var value = argParts[1].TrimStart(new [] {' ', '"', '\''}).TrimEnd(new[] { ' ', '"', '\'' });
+                if (cmd == "n")
+                {
+                    StopAfterCountExercises = Convert.ToInt32(value);
+                }
+                if (cmd == "run")
+                {
+                    RunProcessAfterSuccessFinish = value;
+                }
+            }
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            labelCount.Visible = StopAfterCountExercises > 0;
+
             dataGridView1.CellPainting += DrawBoldLineHandler;
             dataGridView1.CellPainting += DrawOperationTypeHandler;
             var f = dataGridView1.Font;
             dataGridView1.DefaultCellStyle.Font = new Font(f.Name, f.Size + 5);
-            var sp = new StandartPrinter(dataGridView1);
-            EManager = new ExerciseManager();
 
             DrawNewExcercise();
         }
 
         private void DrawNewExcercise()
         {
+            if (StopAfterCountExercises > 0)
+            {
+                labelCount.Text = (EManager.ExercisesCount + 1) + "/" + StopAfterCountExercises;
+
+                if (EManager.ExercisesCount == StopAfterCountExercises)
+                {
+                    Close();
+                    if (!String.IsNullOrEmpty(RunProcessAfterSuccessFinish))
+                    {
+                        Process.Start(RunProcessAfterSuccessFinish);
+                    }
+                    return;
+                }
+            }
             dataGridView1.Rows.Clear();
             dataGridView1.RowCount = 9;
             CurrentExercise = EManager.NextExercise();
-            Console.WriteLine("D:" + CurrentExercise.EType.ToString());
+
             switch (CurrentExercise.EType) {
                 case ExerciseType.Divide:
-                    ExerciseDrawer = new DividePrinter(dataGridView1);
+                    ExerciseGridder = new DivideGridder(dataGridView1);
                     break;
                 default:
-                    ExerciseDrawer = new StandartPrinter(dataGridView1);
+                    ExerciseGridder = new StandartGridder(dataGridView1);
                     break;
             }
-            ExerciseDrawer.Print(CurrentExercise);
+            ExerciseGridder.Print(CurrentExercise);
             dataGridView1.Focus();
-            ExerciseDrawer.UpdateAnswer(CurrentExercise, labelAnswer, labelReminder);
+            ExerciseGridder.UpdateAnswer(CurrentExercise, labelAnswer, labelReminder);
 
             labelReminder.Visible = CurrentExercise.EType == ExerciseType.Divide;
             label4.Visible = CurrentExercise.EType == ExerciseType.Divide;
@@ -53,7 +90,7 @@ namespace Columns
 
         private void DrawOperationTypeHandler(object sender, DataGridViewCellPaintingEventArgs ev)
         {
-            foreach (var op in ExerciseDrawer.GetSpecialTexts(CurrentExercise)) {
+            foreach (var op in ExerciseGridder.GetSpecialTexts(CurrentExercise)) {
                 if (ev.ColumnIndex != op.X || ev.RowIndex != op.Y)
                 {
                     continue;
@@ -66,7 +103,7 @@ namespace Columns
 
         private void DrawBoldLineHandler(object sender, DataGridViewCellPaintingEventArgs ev)
         {
-            foreach (var bl in ExerciseDrawer.GetBoldLines())
+            foreach (var bl in ExerciseGridder.GetBoldLines())
             {
                 if (ev.ColumnIndex <= bl.To.X && ev.RowIndex <= bl.To.Y && ev.ColumnIndex >= bl.From.X && ev.RowIndex >= bl.From.Y)
                 {
@@ -105,14 +142,14 @@ namespace Columns
                 return;
             }
             var sc = dataGridView1.SelectedCells[0];
-            if (sc.RowIndex < ExerciseDrawer.GetBlockedRowsCount() || !char.IsDigit(e.KeyChar))
+            if (sc.RowIndex < ExerciseGridder.GetBlockedRowsCount() || !char.IsDigit(e.KeyChar))
             {
                 return;
             }
 
             sc.Value = e.KeyChar;
-            ExerciseDrawer.UpdateAnswer(CurrentExercise, labelAnswer, labelReminder);
-            var offsetX = ExerciseDrawer.GetPressOffsetX();
+            ExerciseGridder.UpdateAnswer(CurrentExercise, labelAnswer, labelReminder);
+            var offsetX = ExerciseGridder.GetPressOffsetX();
             if (sc.ColumnIndex + offsetX < dataGridView1.ColumnCount && sc.ColumnIndex + offsetX >= 0)
             {
                dataGridView1.CurrentCell = dataGridView1.Rows[sc.RowIndex].Cells[sc.ColumnIndex + offsetX];
@@ -134,7 +171,7 @@ namespace Columns
                 if (e.KeyCode == Keys.Delete || e.KeyCode == Keys.Back)
                 {
                     dataGridView1.SelectedCells[0].Value = null;
-                    ExerciseDrawer.UpdateAnswer(CurrentExercise, labelAnswer, labelReminder);
+                    ExerciseGridder.UpdateAnswer(CurrentExercise, labelAnswer, labelReminder);
                 }
                 return;
             }
@@ -144,10 +181,17 @@ namespace Columns
 
         private void button1_Click(object sender, EventArgs e)
         {
-            var answer = CurrentExercise.GetAnswer();
+            ExerciseGridder.ForgetMistakes();
+            var answerCheckResult = ExerciseGridder.CheckAnswer(CurrentExercise);
+            var remainderCheckResult = ExerciseGridder.CheckRemainder(CurrentExercise);
+            if (!answerCheckResult || !remainderCheckResult)
+            {
+                ExerciseGridder.ShowMistakes(Color.Red);
+            }
+
             if (labelReminder.Visible)
             {
-                if (answer.Remainder.ToString() == labelReminder.Text)
+                if (remainderCheckResult)
                 {
                     labelReminder.ForeColor = Color.Green;
                 }
@@ -156,14 +200,14 @@ namespace Columns
                     labelReminder.ForeColor = Color.Red;
                 }
             }
-            if (answer.Answer.ToString() == labelAnswer.Text)
+            if (answerCheckResult)
             {
                 if (labelAnswer.ForeColor == Color.Green)
                 {
                     button1.Text = "Проверить";
-                    if (answer.Answer.ToString() == labelAnswer.Text && answer.Remainder.ToString() == labelReminder.Text)
+                    if (answerCheckResult && remainderCheckResult)
                     {
-                        //DrawNewExcercise();
+                        DrawNewExcercise();
                     }
                 }
                 else
@@ -176,7 +220,10 @@ namespace Columns
             {
                 labelAnswer.ForeColor = Color.Red;
             }
-            DrawNewExcercise();
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
         }
     }
 }

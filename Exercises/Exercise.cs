@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Columns.Exercises.Answers;
+using System;
 
 namespace Columns.Exercises
 {
@@ -45,10 +42,10 @@ namespace Columns.Exercises
         {
             switch (EType)
             {
-                case ExerciseType.Multiply: return new ExerciseAnswer(Number1 * Number2);
+                case ExerciseType.Multiply: return new MultiplyAnswer(Number1 * Number2);
                 case ExerciseType.Plus: return new ExerciseAnswer(Number1 + Number2);
                 case ExerciseType.Minus: return new ExerciseAnswer(Number1 - Number2);
-                default: return new ExerciseAnswer(Number1 / Number2, Number1 % Number2);
+                default: return new DivideAnswer(Number1 / Number2, Number1 % Number2);
             }
         }
     }

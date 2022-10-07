@@ -12,6 +12,8 @@ namespace Columns.Exercises
         private List<ExerciseType> ExerciseTypesCurrentSet = new List<ExerciseType>();
         private Random Rand = new Random();
 
+        public int ExercisesCount { get; private set; }
+
         public Exercise NextExercise()
         {
             if (ExerciseTypesCurrentSet.Count == 0) {
@@ -23,7 +25,7 @@ namespace Columns.Exercises
             var eType = ExerciseTypesCurrentSet[index];
             ExerciseTypesCurrentSet.RemoveAt(index);
             exercise.InitAs(eType);
-            Console.WriteLine(eType);
+            ExercisesCount++;
 
             return exercise;
         }

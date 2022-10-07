@@ -48,12 +48,17 @@
   <ItemGroup>
     <Compile Include="BoldLine.cs" />
     <Compile Include="BoldLineType.cs" />
-    <Compile Include="Exercises\ExerciseAnswer.cs" />
+    <Compile Include="Exceptions\WrongExerciseTypeException.cs" />
+    <Compile Include="ExcerciseGrid\GridderBase.cs" />
+    <Compile Include="Exercises\Answers\AnswerInterface.cs" />
+    <Compile Include="Exercises\Answers\DivideAnswer.cs" />
+    <Compile Include="Exercises\Answers\ExerciseAnswer.cs" />
     <Compile Include="Exercises\ExerciseType.cs" />
     <Compile Include="Exercises\Exercise.cs" />
-    <Compile Include="ExcerciseView\DividePrinter.cs" />
-    <Compile Include="ExcerciseView\PrinterInterface.cs" />
+    <Compile Include="ExcerciseGrid\DivideGridder.cs" />
+    <Compile Include="ExcerciseGrid\GridderInterface.cs" />
     <Compile Include="Exercises\ExerciseManager.cs" />
+    <Compile Include="Exercises\Answers\MultiplyAnswer.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -62,7 +67,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ExcerciseView\StandartPrinter.cs" />
+    <Compile Include="ExcerciseGrid\StandartGridder.cs" />
     <Compile Include="SpecialText.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>

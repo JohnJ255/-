@@ -47,6 +47,7 @@
             this.labelAnswer = new System.Windows.Forms.Label();
             this.labelReminder = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
+            this.labelCount = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -235,11 +236,22 @@
             this.label4.Text = "Остаток:";
             this.label4.Visible = false;
             // 
+            // labelCount
+            // 
+            this.labelCount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.labelCount.AutoSize = true;
+            this.labelCount.Location = new System.Drawing.Point(311, 13);
+            this.labelCount.Name = "labelCount";
+            this.labelCount.Size = new System.Drawing.Size(24, 13);
+            this.labelCount.TabIndex = 12;
+            this.labelCount.Text = "0/0";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(348, 301);
+            this.Controls.Add(this.labelCount);
             this.Controls.Add(this.labelReminder);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.labelAnswer);
@@ -251,6 +263,7 @@
             this.MinimumSize = new System.Drawing.Size(364, 291);
             this.Name = "Form1";
             this.Text = "Столбики";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
@@ -279,6 +292,7 @@
         private System.Windows.Forms.Label labelAnswer;
         private System.Windows.Forms.Label labelReminder;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label labelCount;
     }
 }
 
