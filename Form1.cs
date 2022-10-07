@@ -63,7 +63,9 @@ namespace Columns
                     Close();
                     if (!String.IsNullOrEmpty(RunProcessAfterSuccessFinish))
                     {
-                        Process.Start(RunProcessAfterSuccessFinish);
+                        var procInfo = new ProcessStartInfo(RunProcessAfterSuccessFinish);
+                        procInfo.UseShellExecute = true;
+                        Process.Start(procInfo);
                     }
                     return;
                 }
