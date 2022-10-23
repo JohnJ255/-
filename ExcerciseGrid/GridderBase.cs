@@ -44,7 +44,7 @@ namespace Columns.ExcerciseGrid
         protected string ReadNumberWithSpaces(int xFrom, int xTo, int y)
         {
             var answer = "";
-            for (int i = xFrom; i <= xTo; i++)
+            for (int i = xFrom; i < xTo; i++)
             {
                 if (DataGrid[i, y].Value == null)
                 {

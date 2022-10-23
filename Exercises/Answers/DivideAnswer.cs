@@ -43,7 +43,7 @@ namespace Columns.Exercises.Answers
                 }
                 if (i == len - 1)
                 {
-                    result.Add(subNumber.Answer - intermediateValue);
+                    result.Add(subNumber.Remainder);
                 }
             }
 

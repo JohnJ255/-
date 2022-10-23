@@ -179,7 +179,7 @@ namespace Columns.ExcerciseGrid
                 return remainderCheckResult;
             }
 
-            var xTo = xFrom + exercise.Number1.ToString().Length - 1;
+            var xTo = xFrom + exercise.Number1.ToString().Length;
 
 
             var intermediates = answer.CalcIntermediate(exercise);
